@@ -4,6 +4,7 @@
 #include "myStack.h"
 #include "Console.h"
 #include "enumForMsg.h"
+#include "stage.h"
 
 // Title Scene Logic
 void updateTitle();

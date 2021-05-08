@@ -66,6 +66,7 @@ void renderTitle() {
 void menuProc() {
 	switch (menuIndex) {
 	case GAME_START:
+		stageInit();
 		gMsgStack.push((unsigned int)MESSAGE::CHANGE_SCENE_TO_GAME);
 		break;
 	case GAME_LOAD:
@@ -102,8 +103,8 @@ void updateTitle() {
 		default:
 			// 불필요 키보드 처리는 무시합니다.
 			// 나머지 처리되지 않은 메시지는 다시 스택에 넣습니다.
-			if (msg & 0xFFFF0000) {
-				gMsgStack.push(msg);
+			if ((unsigned int)msg & 0xF0) {
+				gMsgStack.push((unsigned int)msg);
 			}
 			break;
 		}

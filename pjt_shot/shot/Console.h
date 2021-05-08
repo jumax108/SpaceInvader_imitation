@@ -13,8 +13,8 @@
 #define dfSCREEN_WIDTH		143	// 콘솔 가로 142 + null
 #define dfSCREEN_HEIGHT		51	// 콘솔 세로 51
 
-#define MAP_WIDTH			dfSCREEN_WIDTH - 3 // 실제 출력 가능한 가로 크기
-#define MAP_HEIGHT			dfSCREEN_HEIGHT - 2 // 실제 출력 가능한 세로 크기
+#define MAP_WIDTH			(dfSCREEN_WIDTH - 3) // 실제 출력 가능한 가로 크기
+#define MAP_HEIGHT			(dfSCREEN_HEIGHT - 2) // 실제 출력 가능한 세로 크기
 
 //-------------------------------------------------------------
 // 콘솔 제어를 위한 준비 작업.

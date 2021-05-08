@@ -8,11 +8,16 @@
 #include "TitleScene.h"
 #include "GameScene.h"
 #include "enumForMsg.h"
+#include "ClearScene.h"
+#include "GameOverScene.h"
+#include "stage.h"
 
 enum SCENE {
 	TITLE_SCENE = 0,
 	GAME_SCENE,
-	RESULT_SCENE
+	CLEAR_SCENE,
+	GAMEOVER_SCENE,
+	GAME_STOP
 };
 
 
@@ -92,37 +97,35 @@ void input() {
 
 	if (GetAsyncKeyState(VK_UP)) {
 		gMsgStack.push((int)MESSAGE::KEY_UP);
-		return;
 	}
 
 	if (GetAsyncKeyState(VK_DOWN)) {
 		gMsgStack.push((int)MESSAGE::KEY_DOWN);
-		return;
 	}
 
 	if (GetAsyncKeyState(VK_LEFT)) {
 		gMsgStack.push((int)MESSAGE::KEY_LEFT);
-		return;
 	}
 
 	if (GetAsyncKeyState(VK_RIGHT)) {
 		gMsgStack.push((int)MESSAGE::KEY_RIGHT);
-		return;
+	}
+
+	if (GetAsyncKeyState(VK_SPACE)) {
+		gMsgStack.push((int)MESSAGE::KEY_SPACE);
 	}
 
 	if (GetAsyncKeyState(VK_RETURN)) {
 		gMsgStack.push((int)MESSAGE::KEY_ENTER);
-		return;
 	}
 
 	if (GetAsyncKeyState(VK_ESCAPE)) {
 		gMsgStack.push((int)MESSAGE::KEY_ESC);
-		return;
 	}
 }
 
 // 해당 씬에서 발생했으나 해당 씬에서 처리할 메시지가 아닌 것 처리
-bool mainProc() {
+MESSAGE mainProc() {
 	int msgNum = gMsgStack.getSize();
 
 	for (int msgCnt = 0; msgCnt < msgNum; ++msgCnt) {
@@ -132,27 +135,53 @@ bool mainProc() {
 		case MESSAGE::CHANGE_SCENE_TO_GAME:
 			gScene = GAME_SCENE;
 			gMsgStack.push((unsigned int)MESSAGE::INIT_GAME_SCENE);
+			return MESSAGE::SCENE_CHANGED;
 			break;
 		case MESSAGE::CHANGE_SCENE_TO_TITLE:
 			gScene = TITLE_SCENE;
+			return MESSAGE::SCENE_CHANGED;
+		case MESSAGE::CHANGE_SCENE_TO_CLEAR:
+			gScene = CLEAR_SCENE;
+			return MESSAGE::SCENE_CHANGED;
+		case MESSAGE::CHANGE_SCENE_TO_GAMEOVER:
+			gScene = GAMEOVER_SCENE;
+			return MESSAGE::SCENE_CHANGED;
+		case MESSAGE::NEXT_STAGE:
+			gScene = GAME_STOP;
+			if (stageHandler() == false) {
+				gMsgStack.push((unsigned int)MESSAGE::CHANGE_SCENE_TO_CLEAR);
+			}
+			else {
+				gMsgStack.push((unsigned int)MESSAGE::CHANGE_SCENE_TO_GAME);
+			}
 			break;
 		case MESSAGE::GAME_PROCESS_CLOSE:
-			return false;
+			return MESSAGE::GAME_PROCESS_CLOSE;
 		default:
-			gMsgStack.push(msg);
+			// 불필요 키보드 처리는 무시합니다.
+			// 나머지 처리되지 않은 메시지는 다시 스택에 넣습니다.
+			if ((unsigned int)msg & 0xF0) {
+				gMsgStack.push((unsigned int)msg);
+			}
 			break;
 		}
 	}
-	return true;
+	return MESSAGE::GAME_PROCESS_RUNNING;
 }
 
-bool update() {
+MESSAGE update() {
 	switch (gScene) {
 		case TITLE_SCENE:
 			updateTitle();
 			break;
 		case GAME_SCENE:
 			updateGame();
+			break;
+		case CLEAR_SCENE:
+			updateClear();
+			break;
+		case GAMEOVER_SCENE:
+			updateGameOver();
 			break;
 	}
 
@@ -169,6 +198,12 @@ void render() {
 	case GAME_SCENE:
 		renderGame();
 		break;
+	case CLEAR_SCENE:
+		renderClear();
+		break;
+	case GAMEOVER_SCENE:
+		renderGameOver();
+		break;
 	}
 
 	Buffer_Flip();
@@ -177,29 +212,23 @@ void render() {
 int main(void)
 {
 	init();
+	
+	srand(time(nullptr));
 
-	time_t start;
-	time_t end;
-	float frameDelay = 1000.0 / gMaxFrame;
-
-	while (true)
-	{
-		start = clock();
-
+	while (true){
 		input();
 
-		if (update() == false) {
-			break;
+		switch (update()) {
+		case MESSAGE::SCENE_CHANGED:
+			goto NextFrame;
+		case MESSAGE::GAME_PROCESS_CLOSE:
+			return 0;
 		}
 		
 		render();
 
-		end = clock();
-
+	NextFrame:
 		Sleep(100);
-		if (frameDelay > gFrameTime) {
-		//	Sleep(frameDelay - gFrameTime);
-		}
 
 	}
 	return 0;
