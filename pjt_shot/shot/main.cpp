@@ -97,7 +97,6 @@ void input() {
 	static bool downPressed = false;
 
 	if (GetAsyncKeyState(VK_UP) && (scene != TITLE_SCENE || upPressed == false)) {
-		_getch();
 		msgStack.push((int)MESSAGE::KEY_UP);
 		upPressed = true;
 	}
@@ -106,7 +105,6 @@ void input() {
 	}
 
 	if (GetAsyncKeyState(VK_DOWN) && (scene != TITLE_SCENE || downPressed == false)) {
-		_getch();
 		msgStack.push((int)MESSAGE::KEY_DOWN);
 		downPressed = true;
 	}
@@ -115,12 +113,10 @@ void input() {
 	}
 
 	if (GetAsyncKeyState(VK_LEFT)) {
-		_getch();
 		msgStack.push((int)MESSAGE::KEY_LEFT);
 	}
 
 	if (GetAsyncKeyState(VK_RIGHT)) {
-		_getch();
 		msgStack.push((int)MESSAGE::KEY_RIGHT);
 	}
 

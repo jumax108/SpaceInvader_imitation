@@ -4,16 +4,17 @@ extern my::stack msgStack;
 extern char szScreenBuffer[dfSCREEN_HEIGHT][dfSCREEN_WIDTH];
 
 
-const static int titleWidth = 50;
-const static int titleHeight = 5;
+const static int textWidth = 50;
+const static int textHeight = 5;
 
+// 출력 배수
 const static int widthRatio = 2;
 const static int heightRatio = 2;
 
-const static int titlePositionTop = MAP_HEIGHT / 2 - (titleHeight * heightRatio / 2);
-const static int titlePositionLeft = MAP_WIDTH / 2 - (titleWidth * widthRatio / 2);
+const static int textPositionTop = MAP_HEIGHT / 2 - (textHeight * heightRatio / 2);
+const static int textPositionLeft = MAP_WIDTH / 2 - (textWidth * widthRatio / 2);
 
-const static char mainText[titleHeight][titleWidth] = { "GGGGG   A   M   M EEEEE    OOO  V   V EEEEE RRRRR", 
+const static char mainText[textHeight][textWidth] = {   "GGGGG   A   M   M EEEEE    OOO  V   V EEEEE RRRRR", 
 														"G      A A  MM MM E       O   O V   V E     R   R",
 														"G  GG A   A M M M EEEEE   O   O V   V EEEEE RRRR ",
 														"G   G AAAAA M   M E       O   O  V V  E     R  R ",
@@ -21,11 +22,11 @@ const static char mainText[titleHeight][titleWidth] = { "GGGGG   A   M   M EEEEE
 void renderGameOver() {
 	// -------------------------------------------------------------------------------------
 	// GAME OVER 출력
-	for (int heightCnt = 0; heightCnt < titleHeight; heightCnt++) {
+	for (int heightCnt = 0; heightCnt < textHeight; heightCnt++) {
 		for (int heightRatioCnt = 0; heightRatioCnt < heightRatio; heightRatioCnt++) {
-			for (int widthCnt = 0; widthCnt < titleWidth - 1; widthCnt++) {
+			for (int widthCnt = 0; widthCnt < textWidth - 1; widthCnt++) {
 				for (int widthRatioCnt = 0; widthRatioCnt < widthRatio; widthRatioCnt++) {
-					szScreenBuffer[heightCnt * heightRatio + titlePositionTop + heightRatioCnt][widthCnt * widthRatio + titlePositionLeft + widthRatioCnt] = mainText[heightCnt][widthCnt];
+					szScreenBuffer[heightCnt * heightRatio + textPositionTop + heightRatioCnt][widthCnt * widthRatio + textPositionLeft + widthRatioCnt] = mainText[heightCnt][widthCnt];
 				}
 			}
 		}
@@ -35,7 +36,7 @@ void renderGameOver() {
 	// -------------------------------------------------------------------------------------
 	// Press Enter to continue 출력
 	char text[] = "Press Enter to Continue";
-	drawText((titlePositionTop + titleHeight * heightRatio + 5), (MAP_WIDTH / 2 - sizeof(text) / 2), text);
+	drawText((textPositionTop + textHeight * heightRatio + 5), (MAP_WIDTH / 2 - sizeof(text) / 2), text);
 	// -------------------------------------------------------------------------------------
 
 	return;
