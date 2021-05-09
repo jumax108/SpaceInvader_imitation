@@ -92,19 +92,35 @@ void init() {
 // -------------------------------------------------------------------------------------
 void input() {
 
-	if (GetAsyncKeyState(VK_UP)) {
+	// 타이틀 화면에서는 꾹 누르면 인식하지 않도록 하기 위함
+	static bool upPressed = false;
+	static bool downPressed = false;
+
+	if (GetAsyncKeyState(VK_UP) && (scene != TITLE_SCENE || upPressed == false)) {
+		_getch();
 		msgStack.push((int)MESSAGE::KEY_UP);
+		upPressed = true;
+	}
+	else if(GetAsyncKeyState(VK_UP) == false){
+		upPressed = false;
 	}
 
-	if (GetAsyncKeyState(VK_DOWN)) {
+	if (GetAsyncKeyState(VK_DOWN) && (scene != TITLE_SCENE || downPressed == false)) {
+		_getch();
 		msgStack.push((int)MESSAGE::KEY_DOWN);
+		downPressed = true;
+	}
+	else if(GetAsyncKeyState(VK_DOWN) == false){
+		downPressed = false;
 	}
 
 	if (GetAsyncKeyState(VK_LEFT)) {
+		_getch();
 		msgStack.push((int)MESSAGE::KEY_LEFT);
 	}
 
 	if (GetAsyncKeyState(VK_RIGHT)) {
+		_getch();
 		msgStack.push((int)MESSAGE::KEY_RIGHT);
 	}
 
