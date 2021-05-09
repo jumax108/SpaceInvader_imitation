@@ -2,109 +2,111 @@
 
 void drawUnit(int y, int x, const char* img, int height, int width);
 void initMap();
-bool bulletFire(int y, int x, bool isVisible, bool isEnemy);
-void bulletDelete(int index);
+bool userBulletFire(int y, int x, bool isVisible);
+void userBulletDelete(int index);
+bool enemyBulletFire(int y, int x, bool isVisible);
+void enemyBulletDelete(int index);
 void drawStage();
 void drawLife();
 void drawBullet();
+void drawBulletNum();
 void drawEnemy();
 
-extern my::stack gMsgStack;
+extern my::stack msgStack;
 extern char szScreenBuffer[dfSCREEN_HEIGHT][dfSCREEN_WIDTH];
 
 static char map[MAP_HEIGHT][MAP_WIDTH + 1] = {0,};
-int gStage = 1;
-
-
-struct _Unit {
-	int y;
-	int x;
-	int hp;
-
-	int spriteWidth;
-	int spriteHeight;
-	char** sprite;
-};
-
-
-
-// user
-
-_Unit user;
-
-#define USER_WIDTH 9
-#define USER_HEIGHT 7
-
-char userChar[USER_HEIGHT][USER_WIDTH + 1] 
-					= {"         ",
-					   "    O    ",
-					   "  O O O  ",
-					   "  O O O  ",
-					   " OOOOOOO ",
-					   "  O   O  ",
-                       "         "};
-
-// enemy
-
-#define MAX_ENEMY_NUM 36
-_Unit enemy[MAX_ENEMY_NUM];
-
-#define ENEMY_WIDTH 5
-#define ENEMY_HEIGHT 2
-
-int enemyNum;
-char enemyChar[ENEMY_HEIGHT][ENEMY_WIDTH + 1] = { " @@@ ", "  @  " };
-
-int moveDirection = -1;
+int stage = 1;
 
 // bullet
 
 struct _Bullet {
 	int y;
 	int x;
-	bool isEnemy;
 	bool isVisible;
 };
 
-const int MAX_BULLET_NUM = 30;
-_Bullet bullet[MAX_BULLET_NUM];
-my::stack notUsedBullet(MAX_BULLET_NUM);
+// user
+
+_Unit user;
+
+#define USER_WIDTH 7
+#define USER_HEIGHT 5
+
+char userChar[USER_HEIGHT][USER_WIDTH + 1] 
+= {
+"   O   ",
+" O O O ",
+" O O O ",
+"OOOOOOO",
+" O   O " };
+
+const int MAX_USER_BULLET_NUM = 10;
+_Bullet userBullet[MAX_USER_BULLET_NUM];
+my::stack notUsedUserBullet(MAX_USER_BULLET_NUM);
+
+// enemy
+
+#define MAX_ENEMY_NUM 36
+_Unit enemy[MAX_ENEMY_NUM];
+
+#define ENEMY_WIDTH 3
+#define ENEMY_HEIGHT 2
+
+int enemyNum;
+char enemyChar[ENEMY_HEIGHT][ENEMY_WIDTH + 1] = { "@@@", " @ " };
+
+int moveDirection = -1;
+
+const int MAX_ENEMY_BULLET_NUM = 50;
+_Bullet enemyBullet[MAX_ENEMY_BULLET_NUM];
+my::stack notUsedEnemyBullet(MAX_ENEMY_BULLET_NUM);
+
 
 
 void initGame() {
 
+	// -------------------------------------------------------------------------------------
 	// 맵 데이터 초기화
 	initMap();
+	// -------------------------------------------------------------------------------------
 
+	// -------------------------------------------------------------------------------------
 	// 유저 캐릭터 초기화
 	user.y = MAP_HEIGHT - 10;
 	user.x = (MAP_WIDTH) / 2;
 	user.hp = 3;
+	// -------------------------------------------------------------------------------------
 
+	// -------------------------------------------------------------------------------------
 	// 적군 캐릭터 초기화
 	for (int enemyCnt = 0; enemyCnt < MAX_ENEMY_NUM; ++enemyCnt) {
 		enemy[enemyNum].hp = 0;
 	}
+	// -------------------------------------------------------------------------------------
 
-	// 적군 배치
-	enemyNum = 0;
-	for (int y = 5; y <= (5+ENEMY_HEIGHT)*gStage; y += 5 + ENEMY_HEIGHT) {
-		for (int x = 30; x < MAP_WIDTH - 30; x += 5 + ENEMY_WIDTH) {
-			enemy[enemyNum].y = y;
-			enemy[enemyNum].x = x;
-			enemy[enemyNum].hp = 1;
-			enemyNum += 1;
-		}
-	}
 	
+	// -------------------------------------------------------------------------------------
+	// 적군 배치
+	getStageData(enemy, &enemyNum, stage);
+	// -------------------------------------------------------------------------------------
+
+	// -------------------------------------------------------------------------------------
 	// 총알 초기화
-	for (int bulletCnt = 0; bulletCnt < MAX_BULLET_NUM; ++bulletCnt) {
-		bullet[bulletCnt].y = 0;
-		bullet[bulletCnt].x = 0;
-		bullet[bulletCnt].isEnemy = false;
-		bullet[bulletCnt].isVisible = false;
-		notUsedBullet.push(bulletCnt);
+	for (int bulletCnt = 0; bulletCnt < MAX_USER_BULLET_NUM; ++bulletCnt) {
+		userBullet[bulletCnt].y = 0;
+		userBullet[bulletCnt].x = 0;
+		userBullet[bulletCnt].isVisible = false;
+		notUsedUserBullet.push(bulletCnt);
 	}
+
+	for (int bulletCnt = 0; bulletCnt < MAX_ENEMY_BULLET_NUM; ++bulletCnt) {
+		enemyBullet[bulletCnt].y = 0;
+		enemyBullet[bulletCnt].x = 0;
+		enemyBullet[bulletCnt].isVisible = false;
+		notUsedEnemyBullet.push(bulletCnt);
+	}
+	// -------------------------------------------------------------------------------------
 }
 void renderGame() {
 
@@ -116,20 +118,22 @@ void renderGame() {
 
 	drawStage();
 	drawLife();
+	drawBulletNum();
 
+	// map 에 있는 데이터를 버퍼로 이동
 	for (int heightCnt = 0; heightCnt < MAP_HEIGHT; heightCnt++) {
 		drawText(heightCnt + 1, 1, map[heightCnt]);
 	}
 }
 
 void updateGame() {
-	int msgNum = gMsgStack.getSize();
+	int msgNum = msgStack.getSize();
 
 	// -------------------------------------------------------------------------------------
 	// 메시지 처리
 	for (int msgCnt = 0; msgCnt < msgNum; msgCnt++) {
 		MESSAGE msg;
-		gMsgStack.pop((unsigned int*)&msg);
+		msgStack.pop((unsigned int*)&msg);
 
 		switch ((MESSAGE)msg) {
 		case MESSAGE::INIT_GAME_SCENE:
@@ -146,16 +150,16 @@ void updateGame() {
 			}
 			break;
 		case MESSAGE::KEY_SPACE:
-			bulletFire(user.y + 1, user.x + 4, true, false);
+			userBulletFire(user.y, user.x + 3, true);
 			break;
 		case MESSAGE::KEY_ESC:
-			gMsgStack.push((unsigned int)MESSAGE::CHANGE_SCENE_TO_TITLE);
+			msgStack.push((unsigned int)MESSAGE::CHANGE_SCENE_TO_TITLE);
 			break;
 		default:
 			// 불필요 키보드 처리는 무시합니다.
 			// 나머지 처리되지 않은 메시지는 다시 스택에 넣습니다.
 			if ((unsigned int)msg & 0xF0) {
-				gMsgStack.push((unsigned int)msg);
+				msgStack.push((unsigned int)msg);
 			}
 			break;
 		}
@@ -165,72 +169,83 @@ void updateGame() {
 	// -------------------------------------------------------------------------------------
 	// 승리 체크
 	if (enemyNum == 0) {
-		gMsgStack.push((unsigned int)MESSAGE::NEXT_STAGE);
+		msgStack.push((unsigned int)MESSAGE::NEXT_STAGE);
 	}
 	// -------------------------------------------------------------------------------------
 	
 	// -------------------------------------------------------------------------------------
 	// 패배 체크
 	if (user.hp == 0) {
-		gMsgStack.push((unsigned int)MESSAGE::CHANGE_SCENE_TO_GAMEOVER);
+		msgStack.push((unsigned int)MESSAGE::CHANGE_SCENE_TO_GAMEOVER);
 	}
 	// -------------------------------------------------------------------------------------
 
 	// -------------------------------------------------------------------------------------
-	//총알 충돌 처리
-	for (int bulletCnt = 0; bulletCnt < MAX_BULLET_NUM; ++bulletCnt) {
-		if (bullet[bulletCnt].isVisible) {
-			if (bullet[bulletCnt].isEnemy == true) {
+	// 유저 총알 충돌 처리
+	for (int bulletCnt = 0; bulletCnt < MAX_USER_BULLET_NUM; ++bulletCnt) {
+		if (userBullet[bulletCnt].isVisible) {
+			for (int enemyCnt = 0; enemyCnt < MAX_ENEMY_NUM; ++enemyCnt) {
+				if (enemy[enemyCnt].hp > 0 &&
+					enemy[enemyCnt].y <= userBullet[bulletCnt].y &&
+					userBullet[bulletCnt].y < enemy[enemyCnt].y + ENEMY_HEIGHT &&
+					enemy[enemyCnt].x <= userBullet[bulletCnt].x &&
+					userBullet[bulletCnt].x < enemy[enemyCnt].x + ENEMY_WIDTH) {
 
-				if (user.x <= bullet[bulletCnt].x && bullet[bulletCnt].x < user.x + USER_WIDTH &&
-					user.y <= bullet[bulletCnt].y && bullet[bulletCnt].y < user.y + USER_HEIGHT) {
-					user.hp -= 1;
-					bulletDelete(bulletCnt);
-				}
+					enemy[enemyCnt].hp -= 1;
+					userBulletDelete(bulletCnt);
 
-			}
-			else {
-				for (int enemyCnt = 0; enemyCnt < MAX_ENEMY_NUM; ++enemyCnt) {
-					if (enemy[enemyCnt].hp > 0 &&
-						enemy[enemyCnt].y <= bullet[bulletCnt].y &&
-						bullet[bulletCnt].y < enemy[enemyCnt].y + ENEMY_HEIGHT &&
-						enemy[enemyCnt].x <= bullet[bulletCnt].x &&
-						bullet[bulletCnt].x < enemy[enemyCnt].x + ENEMY_WIDTH) {
-
-						enemy[enemyCnt].hp -= 1;
-						bulletDelete(bulletCnt);
+					if (enemy[enemyCnt].hp == 0) {
 						enemyNum -= 1;
-
 					}
 
 				}
-				
 			}
+		}
+	}
+	// -------------------------------------------------------------------------------------
+
+	// -------------------------------------------------------------------------------------
+	// 적 총알 충돌 처리
+	for (int bulletCnt = 0; bulletCnt < MAX_ENEMY_BULLET_NUM; ++bulletCnt) {
+		if (enemyBullet[bulletCnt].isVisible) {
+			
+			if (user.x <= enemyBullet[bulletCnt].x && enemyBullet[bulletCnt].x < user.x + USER_WIDTH &&
+				user.y <= enemyBullet[bulletCnt].y && enemyBullet[bulletCnt].y < user.y + USER_HEIGHT) {
+				user.hp -= 1;
+				enemyBulletDelete(bulletCnt);
+			}
+
+			
 		}
 	}
 	// -------------------------------------------------------------------------------------
 
 
 	// -------------------------------------------------------------------------------------
-	// 총알 이동 처리
-	for (int bulletCnt = 0; bulletCnt < MAX_BULLET_NUM; ++bulletCnt) {
-		if (bullet[bulletCnt].isVisible) {
-
-			if (bullet[bulletCnt].isEnemy == true) {
-				bullet[bulletCnt].y += 1;
+	// 유저 총알 이동 처리
+	for (int bulletCnt = 0; bulletCnt < MAX_USER_BULLET_NUM; ++bulletCnt) {
+		if (userBullet[bulletCnt].isVisible) {
+			userBullet[bulletCnt].y -= 1;
+			if (userBullet[bulletCnt].y <= 0) {
+				userBulletDelete(bulletCnt);
 			}
-			else {
-				bullet[bulletCnt].y -= 1;
-			}
-
-			if (bullet[bulletCnt].y <= 0 || bullet[bulletCnt].y >= MAP_HEIGHT - 1) {
-				bulletDelete(bulletCnt);
-			}
-
-
 		}
 	}
 	// -------------------------------------------------------------------------------------
+
+	// -------------------------------------------------------------------------------------
+	// 적 총알 이동 처리
+	for (int bulletCnt = 0; bulletCnt < MAX_ENEMY_BULLET_NUM; ++bulletCnt) {
+		if (enemyBullet[bulletCnt].isVisible) {
+
+			enemyBullet[bulletCnt].y += 1;
+			if (enemyBullet[bulletCnt].y >= MAP_HEIGHT - 1) {
+				enemyBulletDelete(bulletCnt);
+			}
+		}
+	}
+	// -------------------------------------------------------------------------------------
+
 
 	// -------------------------------------------------------------------------------------
 	// 적 이동 처리
@@ -254,7 +269,7 @@ void updateGame() {
 		if (enemy[enemyCnt].hp > 0) {
 			int rndValue = rand() % 100;
 			if (rndValue == 0) {
-				bulletFire(enemy[enemyCnt].y + 1, enemy[enemyCnt].x + 2, true, true);
+				enemyBulletFire(enemy[enemyCnt].y + 2, enemy[enemyCnt].x + 1, true);
 			}
 		}
 	}
@@ -262,23 +277,41 @@ void updateGame() {
 
 }
 
-void bulletDelete(int index) {
-	bullet[index].isVisible = false;
-	notUsedBullet.push(index);
+void userBulletDelete(int index) {
+	userBullet[index].isVisible = false;
+	notUsedUserBullet.push(index);
+}
+void enemyBulletDelete(int index) {
+	enemyBullet[index].isVisible = false;
+	notUsedEnemyBullet.push(index);
 }
 
-bool bulletFire(int y, int x, bool isVisible, bool isEnemy) {
+bool userBulletFire(int y, int x, bool isVisible) {
 
-	if (notUsedBullet.getSize() == 0) {
+	if (notUsedUserBullet.getSize() == 0) {
 		return false;
 	}
 
 	unsigned int bulletIdx;
-	notUsedBullet.pop(&bulletIdx);
-	bullet[bulletIdx].x = x;
-	bullet[bulletIdx].y = y;
-	bullet[bulletIdx].isVisible = isVisible;
-	bullet[bulletIdx].isEnemy = isEnemy;
+	notUsedUserBullet.pop(&bulletIdx);
+	userBullet[bulletIdx].x = x;
+	userBullet[bulletIdx].y = y;
+	userBullet[bulletIdx].isVisible = isVisible;
+
+	return true;
+}
+
+bool enemyBulletFire(int y, int x, bool isVisible) {
+
+	if (notUsedEnemyBullet.getSize() == 0) {
+		return false;
+	}
+
+	unsigned int bulletIdx;
+	notUsedEnemyBullet.pop(&bulletIdx);
+	enemyBullet[bulletIdx].x = x;
+	enemyBullet[bulletIdx].y = y;
+	enemyBullet[bulletIdx].isVisible = isVisible;
 
 	return true;
 }
@@ -303,20 +336,35 @@ void drawEnemy() {
 	}
 }
 
+// 총알을 출력합니다.
 void drawBullet() {
 
-	for (int bulletCnt = 0; bulletCnt < MAX_BULLET_NUM; ++bulletCnt) {
-		if (bullet[bulletCnt].isVisible == true) {
-			if (bullet[bulletCnt].isEnemy == true) {
-				drawUnit(bullet[bulletCnt].y, bullet[bulletCnt].x, "v", 1, 1);
-			}
-			else {
-				drawUnit(bullet[bulletCnt].y, bullet[bulletCnt].x, "^", 1, 1);
-			}
+	for (int bulletCnt = 0; bulletCnt < MAX_USER_BULLET_NUM; ++bulletCnt) {
+		if (userBullet[bulletCnt].isVisible == true) {
+			drawUnit(userBullet[bulletCnt].y, userBullet[bulletCnt].x, "^", 1, 1);
 		}
+	}
+
+	for (int bulletCnt = 0; bulletCnt < MAX_ENEMY_BULLET_NUM; ++bulletCnt) {
+		if (enemyBullet[bulletCnt].isVisible == true) {
+			drawUnit(enemyBullet[bulletCnt].y, enemyBullet[bulletCnt].x, "v", 1, 1);	
+		}
+	}
+
+}
+
+// 남아있는 총알 수를 출력합니다.
+void drawBulletNum() {
+
+	char lifeText[10] = { 0, };
+	sprintf_s(lifeText, "Bullet %d", notUsedUserBullet.getSize());
+	int txtLen = strlen(lifeText);
+	for (int txtCnt = 0; txtCnt < txtLen; txtCnt++) {
+		map[1][MAP_WIDTH - 10 + txtCnt] = lifeText[txtCnt];
 	}
 }
 
+// 남아있는 목숨 수를 출력합니다.
 void drawLife() {
 
 	char lifeText[10] = { 0, };
@@ -327,9 +375,10 @@ void drawLife() {
 	}
 }
 
+// 현재 몇 스테이지인지 출력합니다.
 void drawStage() {
 	char stageText[10] = { 0, };
-	sprintf_s(stageText, "Stage %d", gStage);
+	sprintf_s(stageText, "Stage %d", stage);
 	int txtLen = strlen(stageText);
 	for (int txtCnt = 0; txtCnt < txtLen; txtCnt++) {
 		map[1][(MAP_WIDTH) / 2 - txtLen / 2 + txtCnt] = stageText[txtCnt];

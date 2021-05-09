@@ -6,6 +6,7 @@
 #include "myStack.h"
 #include "Console.h"
 #include "enumForMsg.h"
+#include "stage.h"
 
 
 // Game Scene Logic

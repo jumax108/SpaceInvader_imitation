@@ -12,18 +12,18 @@
 #include "GameOverScene.h"
 #include "stage.h"
 
-enum SCENE {
+enum _SCENE {
 	TITLE_SCENE = 0,
 	GAME_SCENE,
 	CLEAR_SCENE,
 	GAMEOVER_SCENE,
-	GAME_STOP
+	BLANK_SCENE // 씬 변경은 없으나, 설정이 변경되어야 할 때 사용. ex) stage 변경
 };
 
 
-SCENE gScene = TITLE_SCENE;
+_SCENE scene = TITLE_SCENE;
 
-my::stack gMsgStack(10);
+my::stack msgStack(10);
 
 //--------------------------------------------------------------------
 // 화면 깜빡임을 없애기 위한 화면 버퍼.
@@ -50,10 +50,6 @@ my::stack gMsgStack(10);
 // 매 줄 출력마다 좌표를 강제로 이동하여 확실하게 출력한다.
 //--------------------------------------------------------------------
 char szScreenBuffer[dfSCREEN_HEIGHT][dfSCREEN_WIDTH] = {0,};
-
-time_t gFrameTime = 0;
-
-const int gMaxFrame = 10;
 
 //--------------------------------------------------------------------
 // 버퍼의 내용을 화면으로 찍어주는 함수.
@@ -91,77 +87,87 @@ void init() {
 	szScreenBuffer[dfSCREEN_HEIGHT - 1][dfSCREEN_WIDTH - 1] = '\0';
 }
 
+// -------------------------------------------------------------------------------------
+// 키보드 입력 스택에 저장
+// -------------------------------------------------------------------------------------
 void input() {
 
-	static bool pressed = false;
-
 	if (GetAsyncKeyState(VK_UP)) {
-		gMsgStack.push((int)MESSAGE::KEY_UP);
+		msgStack.push((int)MESSAGE::KEY_UP);
 	}
 
 	if (GetAsyncKeyState(VK_DOWN)) {
-		gMsgStack.push((int)MESSAGE::KEY_DOWN);
+		msgStack.push((int)MESSAGE::KEY_DOWN);
 	}
 
 	if (GetAsyncKeyState(VK_LEFT)) {
-		gMsgStack.push((int)MESSAGE::KEY_LEFT);
+		msgStack.push((int)MESSAGE::KEY_LEFT);
 	}
 
 	if (GetAsyncKeyState(VK_RIGHT)) {
-		gMsgStack.push((int)MESSAGE::KEY_RIGHT);
+		msgStack.push((int)MESSAGE::KEY_RIGHT);
 	}
 
 	if (GetAsyncKeyState(VK_SPACE)) {
-		gMsgStack.push((int)MESSAGE::KEY_SPACE);
+		msgStack.push((int)MESSAGE::KEY_SPACE);
 	}
 
 	if (GetAsyncKeyState(VK_RETURN)) {
-		gMsgStack.push((int)MESSAGE::KEY_ENTER);
+		msgStack.push((int)MESSAGE::KEY_ENTER);
 	}
 
 	if (GetAsyncKeyState(VK_ESCAPE)) {
-		gMsgStack.push((int)MESSAGE::KEY_ESC);
+		msgStack.push((int)MESSAGE::KEY_ESC);
 	}
 }
 
-// 해당 씬에서 발생했으나 해당 씬에서 처리할 메시지가 아닌 것 처리
+// -------------------------------------------------------------------------------------
+// 각 씬 간의 메시지 처리
+// -------------------------------------------------------------------------------------
 MESSAGE mainProc() {
-	int msgNum = gMsgStack.getSize();
+	int msgNum = msgStack.getSize();
 
 	for (int msgCnt = 0; msgCnt < msgNum; ++msgCnt) {
 		unsigned int msg;
-		gMsgStack.pop(&msg);
+		msgStack.pop(&msg);
 		switch ((MESSAGE)msg) {
+
 		case MESSAGE::CHANGE_SCENE_TO_GAME:
-			gScene = GAME_SCENE;
-			gMsgStack.push((unsigned int)MESSAGE::INIT_GAME_SCENE);
+			scene = GAME_SCENE;
+			msgStack.push((unsigned int)MESSAGE::INIT_GAME_SCENE);
 			return MESSAGE::SCENE_CHANGED;
 			break;
+
 		case MESSAGE::CHANGE_SCENE_TO_TITLE:
-			gScene = TITLE_SCENE;
+			scene = TITLE_SCENE;
 			return MESSAGE::SCENE_CHANGED;
+
 		case MESSAGE::CHANGE_SCENE_TO_CLEAR:
-			gScene = CLEAR_SCENE;
+			scene = CLEAR_SCENE;
 			return MESSAGE::SCENE_CHANGED;
+
 		case MESSAGE::CHANGE_SCENE_TO_GAMEOVER:
-			gScene = GAMEOVER_SCENE;
+			scene = GAMEOVER_SCENE;
 			return MESSAGE::SCENE_CHANGED;
+
 		case MESSAGE::NEXT_STAGE:
-			gScene = GAME_STOP;
-			if (stageHandler() == false) {
-				gMsgStack.push((unsigned int)MESSAGE::CHANGE_SCENE_TO_CLEAR);
+			scene = BLANK_SCENE;
+			if (nextStage() == false) {
+				msgStack.push((unsigned int)MESSAGE::CHANGE_SCENE_TO_CLEAR);
 			}
 			else {
-				gMsgStack.push((unsigned int)MESSAGE::CHANGE_SCENE_TO_GAME);
+				msgStack.push((unsigned int)MESSAGE::CHANGE_SCENE_TO_GAME);
 			}
 			break;
+
 		case MESSAGE::GAME_PROCESS_CLOSE:
 			return MESSAGE::GAME_PROCESS_CLOSE;
+
 		default:
 			// 불필요 키보드 처리는 무시합니다.
 			// 나머지 처리되지 않은 메시지는 다시 스택에 넣습니다.
 			if ((unsigned int)msg & 0xF0) {
-				gMsgStack.push((unsigned int)msg);
+				msgStack.push((unsigned int)msg);
 			}
 			break;
 		}
@@ -170,7 +176,7 @@ MESSAGE mainProc() {
 }
 
 MESSAGE update() {
-	switch (gScene) {
+	switch (scene) {
 		case TITLE_SCENE:
 			updateTitle();
 			break;
@@ -191,7 +197,7 @@ MESSAGE update() {
 void render() {
 	Buffer_Clear();
 	
-	switch (gScene) {
+	switch (scene) {
 	case TITLE_SCENE:
 		renderTitle();
 		break;
@@ -216,10 +222,12 @@ int main(void)
 	srand(time(nullptr));
 
 	while (true){
+
 		input();
 
 		switch (update()) {
 		case MESSAGE::SCENE_CHANGED:
+			// 씬 변경 시 render 스킵
 			goto NextFrame;
 		case MESSAGE::GAME_PROCESS_CLOSE:
 			return 0;
