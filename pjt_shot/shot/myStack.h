@@ -3,25 +3,36 @@
 namespace my {
 	class stack {
 
-	protected:
+		using valueType = unsigned int;
+		using ptrType = unsigned int*;
+
+	private:
 		unsigned int capacity;
-		unsigned int* value;
+		ptrType value;
 		unsigned int topIndex;
 
 	public:
 		bool push(
-			unsigned int in // push data
+			const valueType in // push data
+		);
+
+		bool push(
+			const ptrType const in // push data
 		);
 
 		bool pop(
-			unsigned int* const out // for return
+			ptrType const out // for return
 		);
 
 		// get used stack size
-		int getSize();
+		inline int getSize() {
+			return topIndex;
+		}
 
 		// get maximum stack size
-		int getCapacity();
+		inline int getCapacity() {
+			return capacity;
+		}
 
 		stack();
 		stack(

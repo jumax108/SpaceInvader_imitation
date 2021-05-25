@@ -7,25 +7,6 @@ HANDLE  hConsole;
 extern char szScreenBuffer[dfSCREEN_HEIGHT][dfSCREEN_WIDTH];
 
 //-------------------------------------------------------------
-// 이렇게 씁니다.
-//
-// #incude <stdio.h>
-// #include <windows.h>
-// #incude "Console.h"
-//
-// void main(void)
-// {
-//		cs_Initial();
-//
-//		cs_MoveCursor(0, 0);	// 커서를 0, 0 위치로
-//		printf("abcde");		// 0, 0 위치에 글씨를 찍음
-//		cs_MoveCursor(20, 10);	// 커서를 20, 10 위치로
-//		printf("abcde");		// 20, 10 위치에 글씨를 찍음
-//
-// }
-//-------------------------------------------------------------
-
-//-------------------------------------------------------------
 // 콘솔 제어를 위한 준비 작업.
 //
 //-------------------------------------------------------------
@@ -76,20 +57,6 @@ void cs_ClearScreen(void)
 
 	FillConsoleOutputCharacter(GetStdHandle(STD_OUTPUT_HANDLE), ' ', 100*100, { 0, 0 }, &dw);
 
-/*
-	//-------------------------------------------------------------
-	// 화면 크기만큼 세로, 가로 이중 for 문을 사용하여
-	// 각각의 좌표마다 printf(" ");  공백을 전부 출력 해준다.
-	//-------------------------------------------------------------
-	for ( iCountY = 0 ; iCountY < dfSCREEN_HEIGHT; iCountY++ )
-	{
-		for ( iCountX = 0; iCountX < dfSCREEN_WIDTH; iCountX++ )
-		{
-			cs_MoveCursor(iCountX, iCountY);
-			printf(" ");
-		}
-	}
-*/
 }
 
 // ┌─┐

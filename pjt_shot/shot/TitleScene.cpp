@@ -80,9 +80,9 @@ void updateTitle() {
 	int msgNum = msgStack.getSize();
 
 	for(int msgCnt = 0; msgCnt < msgNum ; ++msgCnt){
-		unsigned int msg;
-		msgStack.pop(&msg);
-		switch ((MESSAGE)msg) {
+		MESSAGE msg;
+		msgStack.pop((unsigned int*)&msg);
+		switch (msg) {
 		case MESSAGE::KEY_UP:
 			drawText(menuY + 2 * menuIndex + 2, menuX + 5, "  ");
 			drawText(menuY + 2 * menuIndex + 2, menuX + menuWidth - 5, "  ");
@@ -93,7 +93,7 @@ void updateTitle() {
 			drawText(menuY + 2 * menuIndex + 2, menuX + menuWidth - 5, "  ");
 			menuIndex = (menuIndex + 1 + MAX_MENU_NUM) % (MAX_MENU_NUM );
 			break;
-		case MESSAGE::KEY_ENTER: // enter
+		case MESSAGE::KEY_ENTER:
 			menuProc();
 			break;
 		default:

@@ -11,14 +11,14 @@ stack::stack(unsigned int capacity) {
 
 	topIndex = 0;
 	this->capacity = capacity;
-	value = (unsigned int*)malloc(sizeof(unsigned int) * capacity);
+	value = (stack::ptrType)malloc(sizeof(stack::valueType) * capacity);
 }
 
 stack::~stack() {
 	free(value);
 }
 
-bool stack::push(unsigned int in) {
+bool stack::push(const stack::valueType in) {
 	if (topIndex == capacity) {
 		return false;
 	}
@@ -29,7 +29,18 @@ bool stack::push(unsigned int in) {
 	return true;
 }
 
-bool stack::pop(unsigned int* const out) {
+bool stack::push(const stack::ptrType const in) {
+	if (topIndex == capacity) {
+		return false;
+	}
+
+	value[topIndex] = *in;
+	topIndex += 1;
+
+	return true;
+}
+
+bool stack::pop(stack::ptrType const out) {
 	if (topIndex == 0) {
 		return false;
 	}
@@ -38,12 +49,4 @@ bool stack::pop(unsigned int* const out) {
 	*out = value[topIndex];
 
 	return true;
-}
-
-int stack::getSize() {
-	return topIndex;
-}
-
-int stack::getCapacity() {
-	return capacity;
 }
