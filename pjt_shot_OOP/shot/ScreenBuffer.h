@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Windows.h>
 #include "BaseObject.h"
 
 /* 화면 출력 버퍼 정보 */
@@ -13,17 +14,40 @@ class CScreenBuffer : public CBaseObject{
 
 public:
 
-	virtual void update() = 0;
-	virtual void render() = 0;
+	char** _buffer;
 
-	char** buffer;
+	virtual void update();
+	virtual void render();
 
-	CScreenBuffer* GetInstance();
+	inline static CScreenBuffer* getInstance() {
+
+		static CScreenBuffer pScreenBuffer;
+
+		return &pScreenBuffer;
+
+	}
+
+	// ┌─┐
+	// │  │
+	// └─┘
+	// 위 모양의 박스를 그려줍니다.
+	// y, x은 왼쪽 모서리를 나타냅니다.
+	// height는 박스 내부의 높이, width는 박스 내부의 너비를 의미합니다.
+	// 실제로 width - 1만큼의 바이트를 내부에 써 넣을 수 있습니다.
+	void drawBox(int x, int y, int width, int height);
+
+	void drawText(int x, int y, const char* str);
 
 private:
 
+	HANDLE hConsoleOutput;
+
 	CScreenBuffer();
 	~CScreenBuffer();
+
+	inline void setCursorPosition(short x, short y) {
+		SetConsoleCursorPosition(hConsoleOutput, { x, y });
+	}
 
 };
 
