@@ -6,13 +6,13 @@
 
 CInputManager::CInputManager() {
 
-	keyboardQue = new CQueue(queCap);
+	_keyboardQue = new CQueue(_queCap);
 
 }
 
 CInputManager::~CInputManager() {
 
-	delete(keyboardQue);
+	delete(_keyboardQue);
 
 }
 
@@ -35,7 +35,7 @@ void CInputManager::getKeyboardInput(bool ignoreKeyPressing) {
 
 	static bool keyPressed[256] = {false, };
 
-	CQueue* keyboardQue = this->keyboardQue;
+	CQueue* keyboardQue = this->_keyboardQue;
 
 	SingleKeyInput(VK_UP);
 	SingleKeyInput(VK_DOWN);

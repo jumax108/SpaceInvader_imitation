@@ -5,6 +5,7 @@
 #include "InputManager.h"
 #include "TitleScene.h"
 #include "ScreenBuffer.h"
+#include "GameScene.h"
 
 constexpr int menuBoxWidth = 14;
 constexpr int menuBoxHeight = 3;
@@ -23,14 +24,14 @@ void CTitleScene::init() {
 	pScreenBuffer->drawText(menuBoxX + 1, menuBoxY + 1, "▷ 게임시작 ◁");
 	pScreenBuffer->drawText(menuBoxX + 1, menuBoxY + 3, "▷ 게임종료 ◁");
 
-	ignoreKeyPressing = true;
-	processKill = false;
+	_ignoreKeyPressing = true;
+	_processKill = false;
 
 }
 
 void CTitleScene::update() {
 
-	CQueue* keyboardQue = CInputManager::getInstance()->keyboardQue;
+	CQueue* keyboardQue = CInputManager::getInstance()->_keyboardQue;
 
 	while (keyboardQue->isEmpty() == false) {
 
@@ -41,16 +42,17 @@ void CTitleScene::update() {
 
 		case VK_UP:
 		case VK_DOWN:
-			menuIdx = 1 - menuIdx;
+			_menuIdx = 1 - _menuIdx;
 			break;
 
 		case VK_RETURN: // enter
-			switch (menuIdx) {
+			switch (_menuIdx) {
 			case 0:
 				// game start
+				nextScene = (CScene*)new CGameScene();
 				break;
 			case 1:
-				processKill = true;
+				_processKill = true;
 				break;
 			}
 			break;
@@ -63,16 +65,14 @@ void CTitleScene::update() {
 
 void CTitleScene::render() {
 
-	CScreenBuffer::getInstance()->drawText(menuBoxX + 1 , menuBoxY + (menuIdx * 2 + 1)      , "▶");
-	CScreenBuffer::getInstance()->drawText(menuBoxX + 13, menuBoxY + (menuIdx * 2 + 1)      , "◀");
+	CScreenBuffer::getInstance()->drawText(menuBoxX + 1 , menuBoxY + (_menuIdx * 2 + 1)      , "▶");
+	CScreenBuffer::getInstance()->drawText(menuBoxX + 13, menuBoxY + (_menuIdx * 2 + 1)      , "◀");
 
-	CScreenBuffer::getInstance()->drawText(menuBoxX + 1 , menuBoxY + (4 - (menuIdx * 2 + 1)), "▷");
-	CScreenBuffer::getInstance()->drawText(menuBoxX + 13, menuBoxY + (4 - (menuIdx * 2 + 1)), "◁");
-
-	CScreenBuffer::getInstance()->render();
+	CScreenBuffer::getInstance()->drawText(menuBoxX + 1 , menuBoxY + (4 - (_menuIdx * 2 + 1)), "▷");
+	CScreenBuffer::getInstance()->drawText(menuBoxX + 13, menuBoxY + (4 - (_menuIdx * 2 + 1)), "◁");
 
 }
 
 CTitleScene::CTitleScene() {
-	menuIdx = 0;
+	_menuIdx = 0;
 }

@@ -6,6 +6,7 @@
 #include "InputManager.h"
 
 CScene* scene;
+CScene* nextScene;
 
 void init() {
 
@@ -13,18 +14,27 @@ void init() {
 	
 	scene->init();
 	
+	nextScene = scene;
+
 }
 
 int main() {
 
 	init();
 
-	while(scene->processKill == false) {
+	while(scene->_processKill == false) {
 
-		CInputManager::getInstance()->getKeyboardInput(scene->ignoreKeyPressing);
+		CInputManager::getInstance()->getKeyboardInput(scene->_ignoreKeyPressing);
 
 		scene->update();
 		scene->render();
+		CScreenBuffer::getInstance()->render();
+
+		if (scene != nextScene) {
+			delete scene;
+			scene = nextScene;
+			scene->init();
+		}
 
 		Sleep(100);
 

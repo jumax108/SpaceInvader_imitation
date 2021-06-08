@@ -3,30 +3,30 @@
 
 CQueue::CQueue(int size) {
 
-	arr = (CQueue::ptrType)malloc(size * sizeof(CQueue::valueType));
+	_arr = (CQueue::ptrType)malloc(size * sizeof(CQueue::valueType));
 
-	cap = size;
-	this->size = 0;
-	front = 0;
-	rear = 0;
+	_cap = size;
+	_size = 0;
+	_front = 0;
+	_rear = 0;
 
 }
 
 CQueue::~CQueue() {
 
-	free(arr);
+	free(_arr);
 
 }
 
 bool CQueue::push(CQueue::valueType data) {
 
-	if (cap == size) {
+	if (_cap == _size) {
 		return false;
 	}
 
-	arr[rear] = data;
-	rear = (rear + 1) % cap;
-	size += 1;
+	_arr[_rear] = data;
+	_rear = (_rear + 1) % _cap;
+	_size += 1;
 
 	return true;
 
@@ -34,13 +34,13 @@ bool CQueue::push(CQueue::valueType data) {
 
 bool CQueue::pop(CQueue::ptrType out) {
 
-	if (size == 0) {
+	if (_size == 0) {
 		return false;
 	}
 
-	*out = arr[front];
-	front = (front + 1) % cap;
-	size -= 1;
+	*out = _arr[_front];
+	_front = (_front + 1) % _cap;
+	_size -= 1;
 
 	return true;
 

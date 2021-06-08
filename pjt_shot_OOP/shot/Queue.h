@@ -13,17 +13,21 @@ public:
 	bool pop(ptrType out);
 
 	inline bool isEmpty() {
-		return size == 0;
+		return _size == 0;
+	}
+
+	inline int size() {
+		return _size;
 	}
 
 private:
 
-	ptrType arr;
+	ptrType _arr;
 
-	int cap; // capacity
-	int size;
-	int front;
-	int rear;
+	int _cap; // capacity
+	int _size;
+	int _front;
+	int _rear;
 
 };
 

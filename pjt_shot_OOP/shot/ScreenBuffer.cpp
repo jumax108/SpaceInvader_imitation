@@ -14,12 +14,12 @@ CScreenBuffer::CScreenBuffer() {
 		_buffer[rowCnt][(int)SCREEN_BUFFER_INFO::width - 1] = '\0';
 	}
 
-	hConsoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+	_hConsoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
 
 	CONSOLE_CURSOR_INFO info;
 	info.bVisible = false;
 	info.dwSize = 1;
-	SetConsoleCursorInfo(hConsoleOutput, &info);
+	SetConsoleCursorInfo(_hConsoleOutput, &info);
 
 }
 
@@ -78,6 +78,15 @@ void CScreenBuffer::drawText(int x, int y, const char* str) {
 
 	for (int colCnt = 0; str[colCnt] != '\0'; ++colCnt) {
 		_buffer[y][x + colCnt] = str[colCnt];
+	}
+
+}
+
+void CScreenBuffer::clear() {
+
+	for (int rowCnt = 0; rowCnt < (int)SCREEN_BUFFER_INFO::height; ++rowCnt) {
+		memset(_buffer[rowCnt], ' ', (int)SCREEN_BUFFER_INFO::width);
+		_buffer[rowCnt][(int)SCREEN_BUFFER_INFO::width - 1] = '\0';
 	}
 
 }

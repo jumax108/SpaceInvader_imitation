@@ -2,21 +2,16 @@
 
 #include "Unit.h"
 
-class CScene;
-
-extern CScene* scene;
-
-class CUser : public CUnit {
+class CEnemy : public CUnit{
 
 public:
 
 	virtual void update();
 	virtual void render();
 
-	CUser();
+	CEnemy(int x, int y);
 
 private:
 
-	
+};
 
-};	

@@ -2,6 +2,8 @@
 
 #include "Scene.h"
 
+extern CScene* nextScene;
+
 class CTitleScene : CScene {
 
 public:
@@ -14,6 +16,6 @@ public:
 
 private:
 
-	int menuIdx;
+	int _menuIdx;
 
 };

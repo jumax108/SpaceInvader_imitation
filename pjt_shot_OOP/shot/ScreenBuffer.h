@@ -36,17 +36,23 @@ public:
 	// 실제로 width - 1만큼의 바이트를 내부에 써 넣을 수 있습니다.
 	void drawBox(int x, int y, int width, int height);
 
+	// str 변수에 null 문자 포함해야 합니다.
 	void drawText(int x, int y, const char* str);
+	inline void drawText(int x, int y, const char singleByte) {
+		_buffer[y][x] = singleByte;
+	}
+
+	void clear();
 
 private:
 
-	HANDLE hConsoleOutput;
+	HANDLE _hConsoleOutput;
 
 	CScreenBuffer();
 	~CScreenBuffer();
 
 	inline void setCursorPosition(short x, short y) {
-		SetConsoleCursorPosition(hConsoleOutput, { x, y });
+		SetConsoleCursorPosition(_hConsoleOutput, { x, y });
 	}
 
 };
