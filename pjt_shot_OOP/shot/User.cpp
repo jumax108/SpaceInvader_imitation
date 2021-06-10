@@ -11,6 +11,9 @@
 
 void CUser::update() {
 
+	/* --------------------------------------------------------------------------- */
+	/* 입력 처리 */
+	/* --------------------------------------------------------------------------- */
 	CQueue<int>* keyboardQue = CInputManager::getInstance()->_keyboardQue;
 
 	while (keyboardQue->isEmpty() == false) {
@@ -19,31 +22,35 @@ void CUser::update() {
 
 		switch (msg) {
 		case VK_ESCAPE:
-			((CGameScene*)scene)->_menuMode = true;
+			// 게임 메뉴 열기
+			((CGameScene*)scene)->_isMenuMode = true;
 			scene->_ignoreKeyPressing = true;
 			break;
 		case VK_LEFT:
+			// 왼쪽으로 이동
 			if (_pos.x > 1) {
 				_pos.x -= 1;
 			}
 			break;
 		case VK_RIGHT:
+			// 오른쪽으로 이동
 			if (_pos.x + _width < (int)SCREEN_BUFFER_INFO::width) {
 				_pos.x += 1;
 			}
 			break;
 		case VK_SPACE:
-			// 발사
+			// 공격
 			((CGameScene*)scene)->_unit.push_back((CBaseObject*)new CBullet(_pos.x + 2, _pos.y));
 
 			break;
 #ifdef CHEAT
 		case 'R':
-
+			// 무적 모드 On/Off
 			_immortal = !_immortal;
 
 			break;
 		case 'P':
+			// 전체 화면 공격
 			for (int colCnt = 1; colCnt < (int)SCREEN_BUFFER_INFO::width - 3; ++colCnt) {
 				((CGameScene*)scene)->_unit.push_back((CBaseObject*)new CBullet(colCnt, _pos.y));
 			}
@@ -58,6 +65,10 @@ void CUser::update() {
 
 void CUser::render() {
 
+
+	/* --------------------------------------------------------------------------- */
+	/* user 캐릭터 출력 */
+	/* --------------------------------------------------------------------------- */
 	for (int positionCnt = 0; positionCnt < _patternPosNum; ++positionCnt) {
 
 		position* ptrPosition = &_patternPos[positionCnt];
@@ -66,11 +77,17 @@ void CUser::render() {
 
 	}
 
+	/* --------------------------------------------------------------------------- */
+	/* 목숨 표시 */
+	/* --------------------------------------------------------------------------- */
 	CScreenBuffer::getInstance()->drawText(2, 1, "Life: ");
 	CScreenBuffer::getInstance()->drawText(8, 1, _hp + '0');
 
 #ifdef CHEAT
 
+	/* --------------------------------------------------------------------------- */
+	/* 무적 상태 표시 */
+	/* --------------------------------------------------------------------------- */
 	CScreenBuffer::getInstance()->drawText(2, 2, "IMMORTAL: ");
 	CScreenBuffer::getInstance()->drawText(15, 2, _immortal ? "true":"false");
 
@@ -82,12 +99,18 @@ void CUser::OnCollision(CBaseObject* otherObj) {
 
 #ifdef CHEAT
 
+	/* --------------------------------------------------------------------------- */
+	/* 무적 모드 활성화 시, 총알과 충돌 처리하지 않음 */
+	/* --------------------------------------------------------------------------- */
 	if (_immortal == true) {
 		return;
 	}
 
 #endif
 
+	/* --------------------------------------------------------------------------- */
+	/* 적군 총알 충돌 처리 */
+	/* --------------------------------------------------------------------------- */
 	if (strcmp(((CUnit*)otherObj)->_tag, "enemy_bullet") == 0) {
 
 		_hp -= 1;
@@ -121,6 +144,9 @@ CUser::CUser() {
 	_hp = 3;
 
 
+	/* --------------------------------------------------------------------------- */
+	/* 유저 스프라이트 데이터 로딩 */
+	/* --------------------------------------------------------------------------- */
 	FILE* userData;
 	fopen_s(&userData, "data/user", "rb");
 

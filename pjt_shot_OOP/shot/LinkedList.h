@@ -179,7 +179,7 @@ void CLinkedList<T>::pop_front() {
 	head.child = node->child;
 	node->child->parent = &head;
 
-	delete(node);
+	free(node);
 
 }
 
@@ -191,7 +191,7 @@ void CLinkedList<T>::pop_back() {
 	tail.parent = node->parent;
 	node->parent->child = &tail;
 
-	delete(node);
+	free(node);
 
 }
 

@@ -18,10 +18,12 @@ public:
 
 private:
 
+	// 체력
 	int _hp;
 
 #ifdef CHEAT
 
+	// 무적 모드
 	bool _immortal;
 
 #endif

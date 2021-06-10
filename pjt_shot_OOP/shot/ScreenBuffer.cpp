@@ -16,6 +16,9 @@ CScreenBuffer::CScreenBuffer() {
 
 	_hConsoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
 
+	/* --------------------------------------------------------------------------- */
+	/* 커서 표시 끄기 */
+	/* --------------------------------------------------------------------------- */
 	CONSOLE_CURSOR_INFO info;
 	info.bVisible = false;
 	info.dwSize = 1;
@@ -41,6 +44,9 @@ void CScreenBuffer::update() {
 
 void CScreenBuffer::render() {
 
+	/* --------------------------------------------------------------------------- */
+	/* 버퍼 전체 출력 */
+	/* --------------------------------------------------------------------------- */
 	for (int rowCnt = 0; rowCnt < (int)SCREEN_BUFFER_INFO::height; ++rowCnt) {
 
 		setCursorPosition(0, rowCnt);
@@ -74,6 +80,9 @@ void CScreenBuffer::drawBox(int x, int y, int width, int height) {
 
 }
 
+/* --------------------------------------------------------------------------- */
+/* 버퍼에 text 출력 */
+/* --------------------------------------------------------------------------- */
 void CScreenBuffer::drawText(int x, int y, const char* str) {
 
 	for (int colCnt = 0; str[colCnt] != '\0'; ++colCnt) {
@@ -82,6 +91,9 @@ void CScreenBuffer::drawText(int x, int y, const char* str) {
 
 }
 
+/* --------------------------------------------------------------------------- */
+/* 버퍼 비우기 */
+/* --------------------------------------------------------------------------- */
 void CScreenBuffer::clear() {
 
 	for (int rowCnt = 0; rowCnt < (int)SCREEN_BUFFER_INFO::height; ++rowCnt) {

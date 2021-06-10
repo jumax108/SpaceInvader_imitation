@@ -16,6 +16,7 @@ public:
 
 private:
 
+	// 메뉴 인덱스
 	int _menuIdx;
 
 };

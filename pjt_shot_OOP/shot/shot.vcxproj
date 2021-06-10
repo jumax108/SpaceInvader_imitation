@@ -223,7 +223,6 @@
     <ClCompile Include="GameOverScene.cpp" />
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="InputManager.cpp" />
-    <ClCompile Include="LinkedList.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ScreenBuffer.cpp" />
     <ClCompile Include="TitleScene.cpp" />

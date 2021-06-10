@@ -18,8 +18,12 @@ CInputManager::~CInputManager() {
 
 inline void getSingleKeyboardInput(bool ignoreKeyPressing, int vkey, bool* keyPressed, CQueue<int>* keyboardQue) {
 
+	/* --------------------------------------------------------------------------- */
+	/* 키보드 입력을 큐에 삽입 */
+	/* --------------------------------------------------------------------------- */
 	short keyState = GetAsyncKeyState(vkey);
 
+	// ignoreKeyPressing 변수로 꾹 눌렀을 때 무시할지 큐에 넣을지 판단
 	if (keyState && (ignoreKeyPressing == false || *keyPressed == false)) {
 		*keyPressed = true;
 		keyboardQue->push(vkey);
@@ -37,6 +41,9 @@ void CInputManager::getKeyboardInput(bool ignoreKeyPressing) {
 
 	CQueue<int>* keyboardQue = this->_keyboardQue;
 
+	/* --------------------------------------------------------------------------- */
+	/* 아래 매개변수로 던져진 키보드 입력만 큐에 들어갑니다. */
+	/* --------------------------------------------------------------------------- */
 	SingleKeyInput(VK_UP);
 	SingleKeyInput(VK_DOWN);
 	SingleKeyInput(VK_LEFT);
@@ -45,8 +52,8 @@ void CInputManager::getKeyboardInput(bool ignoreKeyPressing) {
 	SingleKeyInput(VK_ESCAPE);
 	SingleKeyInput(VK_SPACE);
 #ifdef CHEAT
-	SingleKeyInput('R');
-	SingleKeyInput('P');
+	SingleKeyInput('R'); // 무적 키
+	SingleKeyInput('P'); // 전체공격 키
 #endif
 
 }

@@ -1,5 +1,4 @@
 #pragma once
-
 #include <Windows.h>
 #include "BaseObject.h"
 
@@ -14,6 +13,7 @@ class CScreenBuffer : public CBaseObject{
 
 public:
 
+	// 화면 출력용 버퍼
 	char** _buffer;
 
 	virtual void update();
@@ -38,6 +38,7 @@ public:
 
 	// str 변수에 null 문자 포함해야 합니다.
 	void drawText(int x, int y, const char* str);
+
 	inline void drawText(int x, int y, const char singleByte) {
 		_buffer[y][x] = singleByte;
 	}
@@ -46,11 +47,15 @@ public:
 
 private:
 
+	// 콘솔 출력 핸들
 	HANDLE _hConsoleOutput;
 
 	CScreenBuffer();
 	~CScreenBuffer();
 
+	/* --------------------------------------------------------------------------- */
+	/* 커서 위치 변경 */
+	/* --------------------------------------------------------------------------- */
 	inline void setCursorPosition(short x, short y) {
 		SetConsoleCursorPosition(_hConsoleOutput, { x, y });
 	}
