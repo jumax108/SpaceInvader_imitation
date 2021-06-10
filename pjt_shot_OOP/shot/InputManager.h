@@ -1,6 +1,6 @@
 #pragma once
 
-class CQueue;
+#include "Queue.h"
 
 class CInputManager{
 
@@ -8,7 +8,7 @@ class CInputManager{
 
 public:
 
-	CQueue* _keyboardQue;
+	CQueue<int>* _keyboardQue;
 
 	void getKeyboardInput(
 		bool ignoreKeyPressing // true = 키를 꾹 누른 상태 무시

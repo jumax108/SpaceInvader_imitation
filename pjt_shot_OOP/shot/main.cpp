@@ -1,4 +1,5 @@
 ﻿#include <stdio.h>
+#include <time.h>
 
 #include "Scene.h"
 #include "TitleScene.h"
@@ -15,6 +16,8 @@ void init() {
 	scene->init();
 	
 	nextScene = scene;
+
+	srand(time(NULL));
 
 }
 

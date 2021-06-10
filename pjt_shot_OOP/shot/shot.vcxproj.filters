@@ -24,9 +24,6 @@
     <ClCompile Include="ScreenBuffer.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Queue.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="InputManager.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -37,6 +34,18 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Enemy.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Bullet.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="LinkedList.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="GameOverScene.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ClearScene.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
@@ -69,6 +78,18 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Enemy.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Bullet.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="LinkedList.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="GameOverScene.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ClearScene.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

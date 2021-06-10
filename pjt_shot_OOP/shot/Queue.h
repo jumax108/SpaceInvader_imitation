@@ -1,33 +1,30 @@
 #pragma once
-class CQueue{
 
-	using valueType = int;
+#include "LinkedList.h"
+
+template<typename T>
+class CQueue: public CLinkedList<T>{
+
+	using valueType = T;
 	using ptrType = valueType*;
 
 public:
 
-	CQueue(int size);
-	~CQueue();
+	CQueue() : CLinkedList<T>(){}
+	~CQueue() {}
 
-	bool push(valueType data);
-	bool pop(ptrType out);
-
-	inline bool isEmpty() {
-		return _size == 0;
+	inline void push(valueType data) {
+		this->push_back(data);
+	}
+	inline void pop(ptrType out) {
+		*out = this->begin()->value;
+		this->pop_front();
 	}
 
-	inline int size() {
-		return _size;
+	inline bool isEmpty() {
+		return this->head.child == &(this->tail);
 	}
 
 private:
 
-	ptrType _arr;
-
-	int _cap; // capacity
-	int _size;
-	int _front;
-	int _rear;
-
 };
-

@@ -2,12 +2,13 @@
 
 #include "BaseObject.h"
 
-class CUnit : CBaseObject {
+class CUnit : public CBaseObject {
 
-protected:
+public:
 	struct position {
-		int x;
-		int y;
+		using dataType = int;
+		dataType x;
+		dataType y;
 	};
 
 public:
@@ -15,14 +16,27 @@ public:
 	virtual void update() = 0;
 	virtual void render() = 0;
 
-	int _x;
-	int _y;
+	virtual void OnCollision(CBaseObject * otherObj) = 0;
+
+	position _pos;
 	int _width;
+
+	char* _tag;
+
+	inline int getPatternPositionNum() {
+		return _patternPosNum;
+	}
+
+	inline position getPatternPosition(int index) {
+		return _patternPos[index];
+	}
+
+	bool _isDead;
 
 protected:
 
 	char _pattern;
-	int _positionNum;
-	position _position[25];
+	int _patternPosNum;
+	position _patternPos[25];
 
 };

@@ -10,13 +10,20 @@ class CUser : public CUnit {
 
 public:
 
-	virtual void update();
-	virtual void render();
+	void update();
+	void render();
+	void OnCollision(CBaseObject*);
 
 	CUser();
 
 private:
 
-	
+	int _hp;
+
+#ifdef CHEAT
+
+	bool _immortal;
+
+#endif
 
 };	

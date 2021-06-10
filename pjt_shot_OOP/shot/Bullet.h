@@ -1,22 +1,18 @@
 #pragma once
-
 #include "Unit.h"
-
-class CScene;
-
-extern CScene* scene;
-
-class CEnemy : public CUnit{
+class CBullet : public CUnit
+{
 
 public:
 
 	void update();
 	void render();
 	void OnCollision(CBaseObject*);
-
-	CEnemy(int x, int y);
+	CBullet(int x, int y, const char* tag = "bullet");
 
 private:
+
+
 
 };
 

@@ -6,7 +6,7 @@
 
 CInputManager::CInputManager() {
 
-	_keyboardQue = new CQueue(_queCap);
+	_keyboardQue = new CQueue<int>();
 
 }
 
@@ -16,7 +16,7 @@ CInputManager::~CInputManager() {
 
 }
 
-inline void getSingleKeyboardInput(bool ignoreKeyPressing, int vkey, bool* keyPressed, CQueue* keyboardQue) {
+inline void getSingleKeyboardInput(bool ignoreKeyPressing, int vkey, bool* keyPressed, CQueue<int>* keyboardQue) {
 
 	short keyState = GetAsyncKeyState(vkey);
 
@@ -35,7 +35,7 @@ void CInputManager::getKeyboardInput(bool ignoreKeyPressing) {
 
 	static bool keyPressed[256] = {false, };
 
-	CQueue* keyboardQue = this->_keyboardQue;
+	CQueue<int>* keyboardQue = this->_keyboardQue;
 
 	SingleKeyInput(VK_UP);
 	SingleKeyInput(VK_DOWN);
@@ -43,5 +43,10 @@ void CInputManager::getKeyboardInput(bool ignoreKeyPressing) {
 	SingleKeyInput(VK_RIGHT);
 	SingleKeyInput(VK_RETURN);
 	SingleKeyInput(VK_ESCAPE);
+	SingleKeyInput(VK_SPACE);
+#ifdef CHEAT
+	SingleKeyInput('R');
+	SingleKeyInput('P');
+#endif
 
 }

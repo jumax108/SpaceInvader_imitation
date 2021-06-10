@@ -20,7 +20,12 @@ void CTitleScene::init() {
 
 	pScreenBuffer->drawBox(menuBoxX, menuBoxY, menuBoxWidth, menuBoxHeight);
 
-	pScreenBuffer->drawText(10, 3, "SHOT");
+	constexpr int titleX = (int)SCREEN_BUFFER_INFO::width / 2 - 10;
+	pScreenBuffer->drawText(titleX, 13, "SSSSS H   H  OOO  TTTTT");
+	pScreenBuffer->drawText(titleX, 14, "S     H   H O   O   T  ");
+	pScreenBuffer->drawText(titleX, 15, "SSSSS HHHHH O   O   T  ");
+	pScreenBuffer->drawText(titleX, 16, "    S H   H O   O   T  ");
+	pScreenBuffer->drawText(titleX, 17, "SSSSS H   H  OOO    T  ");
 	pScreenBuffer->drawText(menuBoxX + 1, menuBoxY + 1, "▷ 게임시작 ◁");
 	pScreenBuffer->drawText(menuBoxX + 1, menuBoxY + 3, "▷ 게임종료 ◁");
 
@@ -31,7 +36,7 @@ void CTitleScene::init() {
 
 void CTitleScene::update() {
 
-	CQueue* keyboardQue = CInputManager::getInstance()->_keyboardQue;
+	CQueue<int>* keyboardQue = CInputManager::getInstance()->_keyboardQue;
 
 	while (keyboardQue->isEmpty() == false) {
 
