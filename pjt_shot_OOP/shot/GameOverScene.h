@@ -8,7 +8,7 @@ class CGameOverScene : public CScene
 public:
 	void update();
 	void render();
-	void init() {}
+	void init();
 	CGameOverScene();
 
 };

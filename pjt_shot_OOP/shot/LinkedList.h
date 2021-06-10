@@ -200,13 +200,13 @@ typename CLinkedList<T>::iterator CLinkedList<T>::erase(CLinkedList<T>::iterator
 
 
 	CLinkedList<T>::Node* node = iter.node;
-	CLinkedList<T>::Node* child = node->child;
+	--iter;
 
 	node->child->parent = node->parent;
 	node->parent->child = node->child;
 
 	free(node);
 
-	return *(--iter);
+	return iter;
 
 }

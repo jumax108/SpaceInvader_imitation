@@ -4,6 +4,9 @@
 #include "TitleScene.h"
 #include "Queue.h"
 
+void CGameOverScene::init() {
+}
+
 void CGameOverScene::update() {
 
 	/* --------------------------------------------------------------------------- */
@@ -41,4 +44,5 @@ void CGameOverScene::render() {
 
 CGameOverScene::CGameOverScene() {
 	_ignoreKeyPressing = true;
+	_processKill = false;
 }

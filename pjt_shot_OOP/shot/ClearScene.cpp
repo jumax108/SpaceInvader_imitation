@@ -40,4 +40,5 @@ void CClearScene::render() {
 
 CClearScene::CClearScene() {
 	_ignoreKeyPressing = true;
+	_processKill = false;
 }
